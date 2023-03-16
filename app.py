@@ -34,6 +34,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# ---------------------- DB Classes Tables Config ----------------------------
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -55,12 +58,29 @@ class UserRoles(db.Model):
     role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
 
+class Tokens(db.Model):
+    __tablename__ = 'tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    key = db.Column(db.String(50))
+
+    def __init__(self, name, key):
+        self.name = name
+        self.key = key
+
+
+# ---------------------- DB Classes Tables Config - END ----------------------------
+
+
 def validate_username(username):
     existing_user_username = User.query.filter_by(
         username=username.data).first()
     if existing_user_username:
         raise ValidationError(
             'That username already exists. Please choose a different one.')
+
+
+# ---------------------- Flask Form Config ----------------------------
 
 
 class RegisterForm(FlaskForm):
@@ -73,14 +93,6 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Register')
 
 
-class ResetPasswordForm(FlaskForm):
-    # Drop down to grab list of users
-    password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-    submit = SubmitField('Reset Password')
-
-
 class LoginForm(FlaskForm):
     username = StringField(validators=[
         InputRequired(), Length(min=4, max=100)], render_kw={"class": "username", "placeholder": "Username"})
@@ -91,79 +103,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-@app.route('/')
-def home():
-    title = 'Panasonic 2FA'
-    return render_template('home.html', title=title)
+class ResetPasswordForm(FlaskForm):
+    # Drop down to grab list of users
+    password = PasswordField(validators=[
+        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    title = 'Panasonic | Login',
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user)
-                session['user_name'] = form.username.data
-                return redirect(url_for('tokens'))
-    return render_template('login.html', form=form, title=title)
-
-
-@app.route('/tokens', methods=['GET', 'POST'])
-@login_required
-def tokens():
-    title = 'Panasonic | 2FA Tokens'
-    return render_template('test.html', title=title)
-
-
-# ---------------------- Admin Permission Pages ----------------------------
-@app.route('/admin/dashboard')
-# @roles_required('admin')
-def admin_dashboard():
-    title = 'Panasonic | Admin Dashboard'
-    # render the admin dashboard
-    return render_template('2fa-admin/dashboard.html', title=title)
-
-
-@app.route('/admin/tokens/modify', methods=['GET', 'POST'])
-@login_required
-# @roles_required('admin')
-def modify_token():
-    title = 'Panasonic | Modify - 2FA Tokens'
-    form = ModifyToken()
-    if form.validate_on_submit():
-        update_token = Tokens(name=form.platform.data, key=form.key.data)
-        db.session.add(update_token)
-        db.session.commit()
-        return redirect(url_for('tokens'))
-    return render_template('2fa-admin/modify-2fa.html', title=title, form=form)
-
-
-@app.route('/admin/tokens/add', methods=['GET', 'POST'])
-@login_required
-# @roles_required('admin')
-def add_token():
-    title = 'Panasonic | Add - 2FA Tokens'
-    form = AddToken()
-    if form.validate_on_submit():
-        new_token = Tokens(name=form.platform.data, key=form.key.data)
-        db.session.add(new_token)
-        db.session.commit()
-        return redirect(url_for('tokens'))
-    return render_template('2fa-admin/add-2fa.html', title=title, form=form)
-
-
-class Tokens(db.Model):
-    __tablename__ = 'tokens'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    key = db.Column(db.String(50))
-
-    def __init__(self, name, key):
-        self.name = name
-        self.key = key
+    submit = SubmitField('Reset Password')
 
 
 class AddToken(FlaskForm):
@@ -184,12 +129,79 @@ class ModifyToken(FlaskForm):
     submit = SubmitField('Update')
 
 
+# ---------------------- Flask Form Config - END ----------------------------
+
+
+@app.route('/')  # ----- Splash Page ------
+def home():
+    title = 'Panasonic 2FA'
+    return render_template('home.html', title=title)
+
+
+@app.route('/login', methods=['GET', 'POST'])  # ----- Login Page ------
+def login():
+    title = 'Panasonic | Login',
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user)
+                session['user_name'] = form.username.data
+                return redirect(url_for('tokens'))
+    return render_template('login.html', form=form, title=title)
+
+
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     flash('User successfully logged out.')
     return redirect(url_for('home'))
+
+
+@app.route('/tokens', methods=['GET', 'POST'])  # ----- List All Tokens ------
+@login_required
+def tokens():
+    title = 'Panasonic | 2FA Tokens'
+    return render_template('test.html', title=title)
+
+
+# ---------------------- Admin Permission Pages ----------------------------
+@app.route('/admin/dashboard')  # ----- Dashboard Main Page ------
+# @roles_required('admin')
+def admin_dashboard():
+    title = 'Panasonic | Admin Dashboard'
+    # render the admin dashboard
+    return render_template('2fa-admin/dashboard.html', title=title)
+
+
+@app.route('/admin/tokens/modify', methods=['GET', 'POST'])  # ----- Modify Token ------
+@login_required
+# @roles_required('admin')
+def modify_token():
+    title = 'Panasonic | Modify - 2FA Tokens'
+    form = ModifyToken()
+    if form.validate_on_submit():
+        update_token = Tokens(name=form.platform.data, key=form.key.data)
+        db.session.add(update_token)
+        db.session.commit()
+        return redirect(url_for('tokens'))
+    return render_template('2fa-admin/modify-2fa.html', title=title, form=form)
+
+
+@app.route('/admin/tokens/add', methods=['GET', 'POST'])  # ----- Add Token ------
+@login_required
+# @roles_required('admin')
+def add_token():
+    title = 'Panasonic | Add - 2FA Tokens'
+    form = AddToken()
+    if form.validate_on_submit():
+        new_token = Tokens(name=form.platform.data, key=form.key.data)
+        db.session.add(new_token)
+        db.session.commit()
+        return redirect(url_for('tokens'))
+    return render_template('2fa-admin/add-2fa.html', title=title, form=form)
 
 
 @app.route('/admin/register', methods=['GET', 'POST'])
