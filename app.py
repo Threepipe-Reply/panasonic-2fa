@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, session, flash
+from flask import Flask, render_template, url_for, redirect, session
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
 from flask_user import roles_required, UserManager
@@ -156,7 +156,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('User successfully logged out.')
     return redirect(url_for('home'))
 
 
@@ -173,7 +172,7 @@ def tokens():
 def admin_dashboard():
     title = 'Panasonic | Admin Dashboard'
     # render the admin dashboard
-    return render_template('2fa-admin/dashboard.html', title=title)
+    return render_template('admin/dashboard.html', title=title)
 
 
 @app.route('/admin/tokens/modify', methods=['GET', 'POST'])  # ----- Modify Token ------
@@ -187,7 +186,7 @@ def modify_token():
         db.session.add(update_token)
         db.session.commit()
         return redirect(url_for('tokens'))
-    return render_template('2fa-admin/modify-2fa.html', title=title, form=form)
+    return render_template('admin/modify-2fa.html', title=title, form=form)
 
 
 @app.route('/admin/tokens/add', methods=['GET', 'POST'])  # ----- Add Token ------
@@ -201,7 +200,7 @@ def add_token():
         db.session.add(new_token)
         db.session.commit()
         return redirect(url_for('tokens'))
-    return render_template('2fa-admin/add-2fa.html', title=title, form=form)
+    return render_template('admin/add-2fa.html', title=title, form=form)
 
 
 @app.route('/admin/register', methods=['GET', 'POST'])
@@ -217,7 +216,7 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('2fa-admin/register.html', form=form, title=title)
+    return render_template('admin/register.html', form=form, title=title)
 
 
 @app.route('/admin/reset-password', methods=['GET', 'POST'])
@@ -233,7 +232,7 @@ def reset_password():
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('2fa-admin/reset-password.html', form=form, title=title)
+    return render_template('admin/reset-password.html', form=form, title=title)
 
 
 if __name__ == "__main__":

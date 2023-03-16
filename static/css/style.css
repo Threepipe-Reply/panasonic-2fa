@@ -1,0 +1,41 @@
+
+
+.page-title {
+    text-align:center;
+    font-weight:bold;
+}
+
+.form {
+    text-align: center;
+}
+
+.form-control{
+    font-size: 10pt;
+    border-radius: 5px;
+}
+
+.card-box{
+    background-color:white;
+    font-size:22px;
+    font-weight:bold;
+    color:black;
+    margin-bottom:10px;
+    cursor:pointer;
+    box-shadow:0px 10px 35px 0px rgba(154, 161, 171, 0.2)
+}
+
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f9f9f4;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+    z-index: 999;
+}
