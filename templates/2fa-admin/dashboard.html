@@ -1,0 +1,50 @@
+{% extends 'template.html' %}
+
+{% block main %}
+
+    <div class="w3-container" style="margin-top: 2.5%">
+        <h4 class="page-title">Admin Dashboard</h4>
+        <div class="admin-links">
+            <div class="row">
+                <div class="column">
+                    <a href="{{url_for('add_token')}}">
+                        <div class="card">
+                            <div class="card-icon"><img src="{{url_for('static', filename='img/add-token.svg')}}"></div>
+                            <p>Add Token</p>
+
+                        </div>
+                    </a>
+                </div>
+                <div class="column">
+                    <a href="{{url_for('modify_token')}}">
+                        <div class="card">
+                            <div class="card-icon"><img src="{{url_for('static', filename='img/modify-token.svg')}}">
+                            </div>
+                            <p>Modify Token</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="column">
+                    <a href="{{url_for('register')}}">
+                        <div class="card">
+                            <div class="card-icon"><img src="{{url_for('static', filename='img/create-user.svg')}}">
+                            </div>
+                            <p>Create New User</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="column">
+                    <a href="{{url_for('reset_password')}}">
+                        <div class="card">
+                            <div class="card-icon"><img src="{{url_for('static', filename='img/reset-password.svg')}}">
+                            </div>
+                            <p>Reset User Password</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

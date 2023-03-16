@@ -17,7 +17,7 @@ def code_from_secret(secret):
     code = struct.unpack(">L", truncated_hash)[0]  # Convert the 4 bytes to an unsigned integer.
     code &= 0x7FFFFFFF  # Mask the integer to get only the 31 least significant bits.
     code %= 1000000  # Limit the integer to 6 digits.
-    print(f"{code:06}")
+    print(f"{code:06}") # Remember to remove this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return f"{code:06}"
 
 

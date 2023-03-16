@@ -1,19 +1,17 @@
 {% extends 'template.html' %}
 
 {% block main %}
-
 <div class="w3-container" style="margin-top: 2.5%" text-align="center">
-    <h4 class="page-title">Add Token</h4>
-    <form class="modify-token" method="POST" action="">
+    <h4 class="page-title">Create User</h4>
+    <form class="reset-form" method="POST" action="">
         {{ form.hidden_tag() }}
-        {{ form.platform(class_="form-control") }}
+        {{ form.username(class_="form-control") }}
         <br>
         <br>
-        {{ form.key(class_="form-control") }}
+        {{ form.password(class_="form-control") }}
         <br>
         <br>
         {{ form.submit }}
     </form>
 </div>
-
 {% endblock %}

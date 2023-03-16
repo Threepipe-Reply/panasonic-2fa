@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'template.html' %}
 
-</body>
-</html>
+{% block main %}
+
+<div class="w3-container" style="margin-top: 2.5%" text-align="center">
+    <h4 class="page-title">Modify Token</h4>
+    <form class="reset-form" method="POST" action="">
+        {{ form.hidden_tag() }}
+        {{ form.key(class_="form-control") }}
+        <br>
+        <br>
+        {{ form.submit }}
+    </form>
+</div>
+
+{% endblock %}

@@ -1,46 +1,32 @@
-<!DOCTYPE html>
-<html>
-<title>Panasonic | Tokens</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="../static/test.css">
+{% extends 'template.html' %}
 
-<body>
+{% block main %}
 
-<!-- Sidebar -->
-<div class="w3-sidebar w3-bar-block w3-card" style="width:15%;left:0;">
-  <h3 class="w3-bar-item">Menu</h3>
-    <a href="{{url_for('tokens')}}" class="w3-bar-item w3-button">Tokens</a>
-    <a href="{{url_for('logout')}}" class="w3-bar-item w3-button">Logout</a>
-</div>
+    <button class="floating-btn"><a href="{{url_for('admin_dashboard')}}"><img
+        src="{{url_for('static', filename='img/padlock.svg')}}" style="width:10px"></a></button>
 
-<!-- Page Content -->
-<div style="margin-left:15%">
+    <div class="w3-container" style="margin-top: 2.5%">
+        <h4 class="page-title">Two Factor Authentication</h4>
+        <div class="tg-wrap">
+            <table class="tg">
+                <thead>
+                <tr>
+                    <th class="table-header">Platform</th>
+                    <th class="table-header">2FA Code</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- For each token that exists in the table, create a new row -->
+                {% for tokens in tokens %}
+                <tr>
+                    <td>{{ tokens.name }}</td>
+                    <td>{{ tokens.key }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+        </div>
+    </div>
 
-<div class="w3-container w3-grey" style="padding:10px">
-    <img class ="logo" src="https://www.panasonic.com/content/dam/Panasonic/Global/Home-Page/Home-Banner/logo-panasonic.svg" width="250px">
-</div>
-
-<div class="w3-container" style="margin-top: 5%">
-<div class="tg-wrap"><table class="tg">
-<thead>
-  <tr>
-    <th class="tg-ru17">Platform</th>
-    <th class="tg-ru17">2FA Code</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td class="tg-0lax">Name</td>
-    <td class="tg-0lax"><div class="card-box" onclick="copy2FA()">XXXXXX
-      <div class="loader"></div></div>
-    </td>
-  </tr>
-</tbody>
-</table></div>
-</div>
-
-</div>
-
-</body>
-</html>
+{% endblock %}

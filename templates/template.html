@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<title>{{ title }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="../static/css/table.css">
+<link rel="stylesheet" href="../static/css/test.css">
+
+<body>
+
+<!-- Sidebar -->
+<div class="w3-sidebar w3-bar-block w3-card" style="width:15%;right:0;">
+    <h3 class="w3-bar-item">Welcome, {{session['user_name']}}</h3>
+    <a href="{{url_for('tokens')}}" class="w3-bar-item w3-button">Tokens</a>
+    <a href="{{url_for('logout')}}" class="w3-bar-item w3-button">Logout</a>
+</div>
+
+<!-- Header -->
+<div style="margin-right:15%">
+    <div class="w3-container w3-grey" style="padding:20px;">
+        <img class="logo"
+             src="{{url_for('static', filename='img/logo.svg')}}"
+             width="250px">
+    </div>
+</div>
+
+{% block main %}
+{% endblock %}
+
+</body>
+</html>

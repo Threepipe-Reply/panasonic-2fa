@@ -7,4 +7,3 @@ Flask-SQLAlchemy==2.5.1
 Flask-WTF==1.0.1
 SQLAlchemy==1.4.35
 WTForms==3.0.1
-PyOTP==2.8.0
