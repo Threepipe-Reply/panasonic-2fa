@@ -1,32 +1,38 @@
 {% extends 'template.html' %}
 
 {% block main %}
-
-    <button class="floating-btn"><a href="{{url_for('admin_dashboard')}}"><img
+<button class="floating-btn"><a href="{{url_for('admin_dashboard')}}"><img
         src="{{url_for('static', filename='img/padlock.svg')}}" style="width:10px"></a></button>
 
-    <div class="w3-container" style="margin-top: 2.5%">
-        <h4 class="page-title">Two Factor Authentication</h4>
-        <div class="tg-wrap">
-            <table class="tg">
-                <thead>
-                <tr>
-                    <th class="table-header">Platform</th>
-                    <th class="table-header">2FA Code</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- For each token that exists in the table, create a new row -->
-                {% for tokens in tokens %}
-                <tr>
-                    <td>{{ tokens.name }}</td>
-                    <td>{{ tokens.key }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <br>
-        </div>
+<div class="w3-container" style="margin-top: 2.5%">
+    <h4 class="page-title">Two Factor Authentication</h4>
+    <div class="content" style="width:1000px">
+        <table class="table">
+            <thead>
+            <tr>
+                <th class="table-header">Platform</th>
+                <th class="table-header">2FA Code
+                    <div class="loader">
+                        <div class="inner-circle"/>
+                    </div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for token in tokens %}
+            <tr class="row">
+                <td>{{ token[1] }}</td>
+                <td>{{ token[2] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
+
+<script>
+    setInterval(function(){ location.reload() }, 30000)
+
+</script>
 
 {% endblock %}

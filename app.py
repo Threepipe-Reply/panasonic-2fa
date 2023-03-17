@@ -1,12 +1,14 @@
 from flask import Flask, render_template, url_for, redirect, session, abort
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from flask_user import roles_required, UserManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError
 from functools import wraps
+
+import webbrowser
+import time
 
 from main import interval, code_from_secret
 
@@ -21,15 +23,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-
-# user_manager = UserManager()
-# user_manager.init_app(app, db, UserClass='User')
-#
-#
-# @user_manager
-# def user_manager():
-#     return ''
 
 
 @login_manager.user_loader
@@ -76,10 +69,15 @@ def roles_required(*roles):
             if current_user.role not in roles:
                 abort(403)
             return func(*args, **kwargs)
-
         return decorated_view
-
     return wrapper
+
+
+def reload_page():
+    url = "url_for('tokens')"
+    while True:
+        webbrowser.open(url, new=0)
+        time.sleep(30)
 
 
 # ---------------------- Flask Form Config ----------------------------
@@ -168,6 +166,7 @@ def tokens():
     tokens_ = Tokens.query.all()
     # _2fa_code = [(t.id, t.name, interval(t.key)) for t in tokens_]
     _2fa_code = [(t.id, t.name, code_from_secret(t.key)) for t in tokens_]
+    # reload_page()
     return render_template('tokens.html', title=title, tokens=_2fa_code)
 
 
@@ -176,7 +175,6 @@ def tokens():
 @roles_required('admin')
 def admin_dashboard():
     title = 'Panasonic | Admin Dashboard'
-    # render the admin dashboard
     return render_template('admin/dashboard.html', title=title)
 
 
@@ -213,7 +211,6 @@ def add_token():
 def register():
     title = 'Panasonic | Create - User'
     form = RegisterForm()
-
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         new_user = User(username=form.username.data, password=hashed_password)

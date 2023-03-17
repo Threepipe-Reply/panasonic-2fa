@@ -2,7 +2,7 @@
     border-collapse:collapse;
     border-spacing:0;
     margin:1rem auto;
-    width: 600px;
+    width: 900px;
 
 }
 
@@ -23,6 +23,6 @@
     padding:10px 5px;
   }
 
-.row:nth-child(even) {
+.row:nth-child(odd) {
     background-color: #1e1e1e;
 }

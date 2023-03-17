@@ -3,9 +3,16 @@ import hmac
 import struct
 import time
 import calendar
+import threading
+
+
+def interval(secret):
+    threading.Timer(30.0, interval, args=[secret]).start()
+    code_from_secret(secret)
 
 
 def code_from_secret(secret):
+    secret = secret.upper()
     secret = base64.b32decode(secret)  # Decode the base32-encoded secret.
     timestamp = calendar.timegm(
         time.gmtime()) // 30  # Get the timestamp in seconds since the UNIX epoch and convert it to a byte string.
@@ -17,7 +24,6 @@ def code_from_secret(secret):
     code = struct.unpack(">L", truncated_hash)[0]  # Convert the 4 bytes to an unsigned integer.
     code &= 0x7FFFFFFF  # Mask the integer to get only the 31 least significant bits.
     code %= 1000000  # Limit the integer to 6 digits.
-    print(f"{code:06}") # Remember to remove this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return f"{code:06}"
 
 
@@ -42,6 +48,3 @@ def base32_decode(b32):
             binary.append(n & 0xFF)
             n >>= 8
     return bytes(binary)
-
-
-code_from_secret("SWQTBW545GGL5MNDE67X4YUUQW4U6MQDEMM2FN6ISQYV7L4KEOJF7AFAP7JH3IUV")  # Manpreet AWS Test
