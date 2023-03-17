@@ -1,11 +1,14 @@
-from flask import Flask, render_template, url_for, redirect, session
+from flask import Flask, render_template, url_for, redirect, session, abort
 from flask_bcrypt import Bcrypt
-from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user
+from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_user import roles_required, UserManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError
+from functools import wraps
+
+from main import interval, code_from_secret
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -41,21 +44,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    roles = db.relationship('Role', secondary='user_roles',
-                            backref=db.backref('users', lazy='dynamic'))
-
-
-# Define Role model
-class Role(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-
-
-# Define UserRoles model
-class UserRoles(db.Model):
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
+    role = db.Column(db.String(10))
 
 
 class Tokens(db.Model):
@@ -78,6 +67,19 @@ def validate_username(username):
     if existing_user_username:
         raise ValidationError(
             'That username already exists. Please choose a different one.')
+
+
+def roles_required(*roles):
+    def wrapper(func):
+        @wraps(func)
+        def decorated_view(*args, **kwargs):
+            if current_user.role not in roles:
+                abort(403)
+            return func(*args, **kwargs)
+
+        return decorated_view
+
+    return wrapper
 
 
 # ---------------------- Flask Form Config ----------------------------
@@ -104,7 +106,7 @@ class LoginForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    # Drop down to grab list of users
+    username = SelectField('username', choices=[])
     password = PasswordField(validators=[
         InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
@@ -113,7 +115,7 @@ class ResetPasswordForm(FlaskForm):
 
 class AddToken(FlaskForm):
     platform = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Platform Name"})
+        InputRequired(), Length(min=4, max=50)], render_kw={"placeholder": "Platform Name"})
 
     key = StringField(validators=[
         InputRequired(), Length(min=8, max=50)], render_kw={"placeholder": "Key"})
@@ -152,7 +154,7 @@ def login():
     return render_template('login.html', form=form, title=title)
 
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/logout', methods=['GET', 'POST'])  # ----- Logout ------
 @login_required
 def logout():
     logout_user()
@@ -163,12 +165,15 @@ def logout():
 @login_required
 def tokens():
     title = 'Panasonic | 2FA Tokens'
-    return render_template('test.html', title=title)
+    tokens_ = Tokens.query.all()
+    # _2fa_code = [(t.id, t.name, interval(t.key)) for t in tokens_]
+    _2fa_code = [(t.id, t.name, code_from_secret(t.key)) for t in tokens_]
+    return render_template('tokens.html', title=title, tokens=_2fa_code)
 
 
 # ---------------------- Admin Permission Pages ----------------------------
 @app.route('/admin/dashboard')  # ----- Dashboard Main Page ------
-# @roles_required('admin')
+@roles_required('admin')
 def admin_dashboard():
     title = 'Panasonic | Admin Dashboard'
     # render the admin dashboard
@@ -177,7 +182,7 @@ def admin_dashboard():
 
 @app.route('/admin/tokens/modify', methods=['GET', 'POST'])  # ----- Modify Token ------
 @login_required
-# @roles_required('admin')
+@roles_required('admin')
 def modify_token():
     title = 'Panasonic | Modify - 2FA Tokens'
     form = ModifyToken()
@@ -191,7 +196,7 @@ def modify_token():
 
 @app.route('/admin/tokens/add', methods=['GET', 'POST'])  # ----- Add Token ------
 @login_required
-# @roles_required('admin')
+@roles_required('admin')
 def add_token():
     title = 'Panasonic | Add - 2FA Tokens'
     form = AddToken()
@@ -203,10 +208,10 @@ def add_token():
     return render_template('admin/add-2fa.html', title=title, form=form)
 
 
-@app.route('/admin/register', methods=['GET', 'POST'])
-# @roles_required('admin')
+@app.route('/admin/register', methods=['GET', 'POST'])  # ----- Create New User ------
+@roles_required('admin')
 def register():
-    title = 'Panasonic | Create User'
+    title = 'Panasonic | Create - User'
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -219,12 +224,12 @@ def register():
     return render_template('admin/register.html', form=form, title=title)
 
 
-@app.route('/admin/reset-password', methods=['GET', 'POST'])
-# @roles_required('admin')
+@app.route('/admin/reset-password', methods=['GET', 'POST'])  # ----- Reset Password ------
+@roles_required('admin')
 def reset_password():
-    title = 'Panasonic | Reset Password'
+    title = 'Panasonic | Reset Password - User'
     form = ResetPasswordForm()
-
+    form.username = [(users.id, users.username) for users in User.query.all()]
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
         update_pwd = User(password=hashed_password)
