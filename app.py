@@ -7,9 +7,6 @@ from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError
 from functools import wraps
 
-import webbrowser
-import time
-
 from main import code_from_secret
 
 app = Flask(__name__)
@@ -71,13 +68,6 @@ def roles_required(*roles):
             return func(*args, **kwargs)
         return decorated_view
     return wrapper
-
-
-def reload_page():
-    url = "url_for('tokens')"
-    while True:
-        webbrowser.open(url, new=0)
-        time.sleep(30)
 
 
 # ---------------------- Flask Form Config ----------------------------
@@ -164,9 +154,7 @@ def logout():
 def tokens():
     title = 'Panasonic | 2FA Tokens'
     tokens_ = Tokens.query.all()
-    # _2fa_code = [(t.id, t.name, interval(t.key)) for t in tokens_]
     _2fa_code = [(t.id, t.name, code_from_secret(t.key)) for t in tokens_]
-    # reload_page()
     return render_template('tokens.html', title=title, tokens=_2fa_code)
 
 
