@@ -10,7 +10,7 @@ from functools import wraps
 import webbrowser
 import time
 
-from main import interval, code_from_secret
+from main import code_from_secret
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)

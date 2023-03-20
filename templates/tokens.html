@@ -22,7 +22,7 @@
             {% for token in tokens %}
             <tr class="row">
                 <td>{{ token[1] }}</td>
-                <td>{{ token[2] }}</td>
+                <td id="copyBtn{{ token[2] }}" onclick="copy2FA({{ token[2] }})" style="cursor:pointer">{{ token[2] }}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -30,9 +30,29 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-    setInterval(function(){ location.reload() }, 30000)
+// Reloads the div every 30 secs to update TOTP
+setInterval(function(){$(".table").load(" .table > *")}, 30000)
 
+// 15 minutes timeout to refresh the page
+ var global = setTimeout(function(){
+      location.reload();
+    }, 900000);
+
+function copy2FA(token){
+    var tmp = document.getElementById('copyBtn' + token);
+    var temp = tmp.textContent;
+    var el = document.createElement('textarea');
+    el.value = temp;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    var btnCopy = tmp;
+    btnCopy.style.backgroundColor = "green";
+    setTimeout(function(){btnCopy.style.backgroundColor = "initial"},5000)
+    document.body.removeChild(el);
+}
 </script>
 
 {% endblock %}
