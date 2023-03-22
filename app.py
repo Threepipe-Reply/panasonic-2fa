@@ -11,7 +11,8 @@ from main import code_from_secret
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:32gjh11vq3u4UKTC73RUGsSDf@ls-ebdfbede35b0a450dc03bb458edd8dbcaf5d4175.cpt0g6rspea4.eu-west-2.rds.amazonaws.com:3306/dbpanasonic'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
