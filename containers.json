@@ -1,0 +1,8 @@
+{
+    "flask": {
+        "image": ":container-service-1.panasonic2fa.4",
+        "ports": {
+            "5000": "HTTP"
+        }
+    }
+}
