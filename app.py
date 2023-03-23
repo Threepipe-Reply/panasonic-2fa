@@ -73,9 +73,7 @@ def roles_required(*roles):
             if current_user.role not in roles:
                 abort(403)
             return func(*args, **kwargs)
-
         return decorated_view
-
     return wrapper
 
 
@@ -142,7 +140,6 @@ def login():
     title = 'Panasonic | Login',
     form = LoginForm()
     if form.validate_on_submit():
-        print(form.username.data)
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
