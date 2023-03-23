@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, url_for, redirect, session, abort
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -6,12 +8,16 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Length, ValidationError
 from functools import wraps
+import pymysql
 
 from main import code_from_secret
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# DBUSER = os.environ['DBUSER']
+# DBUSER = 'root'
+# DBPASSWORD = os.environ['DBPASSWORD']
+# DBPASSWORD = '32gjh11vq3u4UKTC73RUGsSDf'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:32gjh11vq3u4UKTC73RUGsSDf@ls-ebdfbede35b0a450dc03bb458edd8dbcaf5d4175.cpt0g6rspea4.eu-west-2.rds.amazonaws.com:3306/dbpanasonic'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -67,7 +73,9 @@ def roles_required(*roles):
             if current_user.role not in roles:
                 abort(403)
             return func(*args, **kwargs)
+
         return decorated_view
+
     return wrapper
 
 
@@ -134,6 +142,7 @@ def login():
     title = 'Panasonic | Login',
     form = LoginForm()
     if form.validate_on_submit():
+        print(form.username.data)
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
