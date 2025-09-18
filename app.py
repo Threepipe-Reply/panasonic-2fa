@@ -18,7 +18,7 @@ bcrypt = Bcrypt(app)
 # DBUSER = 'root'
 # DBPASSWORD = os.environ['DBPASSWORD']
 # DBPASSWORD = '32gjh11vq3u4UKTC73RUGsSDf'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:32gjh11vq3u4UKTC73RUGsSDf@ls-ebdfbede35b0a450dc03bb458edd8dbcaf5d4175.cpt0g6rspea4.eu-west-2.rds.amazonaws.com:3306/dbpanasonic'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://dbmasteruser:AkPN_%kQyX(RQAkAFWr%rdG5XSR#I^&x@ls-83fea7f325de39844a470d2854c65bbca7ffd25c.cpt0g6rspea4.eu-west-2.rds.amazonaws.com:3306/dbHelenofTroy'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
